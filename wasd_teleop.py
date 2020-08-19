@@ -12,7 +12,7 @@ import serial
 import time
 import bitstruct
 import numpy as np
-cart_port = '/dev/ttyACM0'  #hardcoded depending on computer
+cart_port = '/dev/ttyUSB0'  #hardcoded depending on computer
 
 """ main program funcitonality """
 class teleop(object):
@@ -88,8 +88,9 @@ class teleop(object):
 
     """ sends a set of throttle, brake, and steering commands to the arduino """
     def send_cmd(self, throttle, brake, steering, stdscr):
-        data = bytearray(b'\x00' * 3)
-        bitstruct.pack_into('u8u8u8', data, 0, throttle, brake, steering)
+        data = bytearray(b'\x00' * 5)
+        bitstruct.pack_into('u8u8u8u8u8', data, 0, 42, 21,
+                            throttle, brake, steering)
         self.cart_ser.write(data)
 
         stdscr.addstr(7, 0, 'Throttle val: ' + str(throttle) + '  ')
