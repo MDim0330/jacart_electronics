@@ -123,7 +123,8 @@ void readCommands() {
     throttleCommand = Serial.read();
     brakeCommand = Serial.read();
     steeringCommand = Serial.read();
-
+    //Serial.print("Steer command:\t\t");
+    //Serial.println(steeringCommand);
 
     if (throttleCommand != -1 && brakeCommand != -1 && steeringCommand != -1) {
       throttleTarget = throttleCommand;
@@ -137,8 +138,8 @@ void setThrottle() {
   int val = map(throttleTarget, 0, 255, LOWER_THROTTLE_BOUNDS, UPPER_THROTTLE_BOUND);
   analogWrite(throttle, val);
 
-  Serial.print("Throttle set:\t\t");
-  Serial.println(throttleTarget);
+  //Serial.print("Throttle set:\t\t");
+  //Serial.println(throttleTarget);
   if (throttleTarget == 0) {
     digitalWrite(throttleRelay, LOW);
   } else {
@@ -150,8 +151,8 @@ void setBrake() {
   int val = map(brakeTarget, 0, 255, LOWER_BRAKE_BOUND, UPPER_BRAKE_BOUND);
   analogWrite(brake, val);
 
-  Serial.print("Brake set:\t\t");
-  Serial.println(brakeTarget);
+  //Serial.print("Brake set:\t\t");
+  //Serial.println(brakeTarget);
   if (brakeTarget == 255) {
     digitalWrite(brakeRelay, LOW);
   } else {
@@ -163,17 +164,17 @@ void steer() {
   if (steeringTarget != -1) {
     // read in the potentiometer value and map from 0 (full left) to 100 (full right)
    currentSteeringPot = analogRead(wiper);
-   Serial.print("Pot Absolute Value: ");
-   Serial.println(currentSteeringPot);
+   //Serial.print("Pot Absolute Value: ");
+   //Serial.println(currentSteeringPot);
    currentSteeringPot = mapf(currentSteeringPot, LOWER_STEER_POT_BOUND, UPPER_STEER_POT_BOUND, 0.0, 100.0);
-   Serial.print("CURR POT ");
-   Serial.println(currentSteeringPot);
+   //Serial.print("CURR POT ");
+   //Serial.println(currentSteeringPot);
    myPID.Compute();
    //Serial.print("RAW COMPUTE ");
    //Serial.println(pidSignal);
    float signal = mapf(pidSignal, LOWER_PID_BOUND, UPPER_PID_BOUND, -STEER_VOLT_MAX_OFFSET, STEER_VOLT_MAX_OFFSET);
-   Serial.print("MAPPED SIGNAL: ");
-   Serial.println(signal);
+   //Serial.print("MAPPED SIGNAL: ");
+   //Serial.println(signal);
    setSteerVoltages(signal);
   }
 }
@@ -186,10 +187,10 @@ void setSteerVoltages(float signal) {
       int finalLeft = mapf(NEUTRAL_STEER - signal, 0.0, 5.0, LOWER_STEER_BOUND, UPPER_STEER_BOUND);
       int finalRight = mapf(NEUTRAL_STEER + signal, 0.0, 5.0, LOWER_STEER_BOUND, UPPER_STEER_BOUND);
 
-      Serial.print("LEFT VOLT: ");
-      Serial.println(finalLeft);
-      Serial.print("RIGHT VOLT: ");
-      Serial.println(finalRight);
+      //Serial.print("LEFT VOLT: ");
+      //Serial.println(finalLeft);
+      //Serial.print("RIGHT VOLT: ");
+      //aaaaaSerial.println(finalRight);
     
       analogWrite(leftSteer, finalLeft);
       analogWrite(rightSteer, finalRight);
