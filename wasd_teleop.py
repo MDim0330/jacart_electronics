@@ -32,7 +32,7 @@ class teleop(object):
 
         # try to set up serial port for sending commands to arduino
         try:
-            self.cart_ser = serial.Serial(cart_port, 9600, write_timeout=0)
+            self.cart_ser = serial.Serial(cart_port, 57600, write_timeout=0)
         except Exception as e:
             print("ERROR. . .could not connect to arduino: " + str(e))
             exit(0)
