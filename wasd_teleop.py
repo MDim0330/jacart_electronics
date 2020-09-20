@@ -80,7 +80,7 @@ class teleop(object):
     """ constructs brake command """
     def brake(self, delay, stdscr):
         rate = 10.
-        steps = delay * rate
+        steps = int(delay * rate)
         for brake in np.linspace(0, 255, steps, endpoint=True):
             self.send_cmd(0, int(brake), self.cur_angle, stdscr)
             time.sleep(1. / rate)
