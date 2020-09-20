@@ -113,15 +113,15 @@ void readCommands() {
         int secondByte = Serial.read();
         if (secondByte == MAGIC_END) {
            
-           int throttleCommand = Serial.read();
-           int brakeCommand = Serial.read();
-           int steeringCommand = Serial.read();
+           throttleTarget = Serial.read();
+           brakeTarget = Serial.read();
+           steeringTarget = Serial.read();
            Serial.print("Steer command:   \t\t");
-           Serial.println(steeringCommand);
+           Serial.println(steeringTarget);
            Serial.print("Brake command:   \t\t");
-           Serial.println(brakeCommand);
+           Serial.println(brakeTarget);
            Serial.print("Throttle command:\t\t");
-           Serial.println(throttleCommand);
+           Serial.println(throttleTarget);
            Serial.println("");
         }
       }
