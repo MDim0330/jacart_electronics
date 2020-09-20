@@ -107,31 +107,26 @@ void loop() {
 }
 
 void readCommands() {
-
-  // values read in from serial
-  int firstByte = Serial.read();
-  int secondByte = Serial.read();
-  int throttleCommand = -1;
-  int brakeCommand = -1;
-  int steeringCommand = -1;
-
-
-  // check to see if you have gotten the magic numbers.
-  if (firstByte == MAGIC_START && secondByte == MAGIC_END) {
-
-    // Read in throttle, brake, and steering data
-    throttleCommand = Serial.read();
-    brakeCommand = Serial.read();
-    steeringCommand = Serial.read();
-    //Serial.print("Steer command:\t\t");
-    //Serial.println(steeringCommand);
-
-    if (throttleCommand != -1 && brakeCommand != -1 && steeringCommand != -1) {
-      throttleTarget = throttleCommand;
-      brakeTarget = brakeCommand;
-      steeringTarget = steeringCommand;
+    if (Serial.available() >= 5){
+      int firstByte = Serial.read();
+      if (firstByte == MAGIC_START) {
+        int secondByte = Serial.read();
+        if (secondByte == MAGIC_END) {
+           
+           int throttleCommand = Serial.read();
+           int brakeCommand = Serial.read();
+           int steeringCommand = Serial.read();
+           Serial.print("Steer command:   \t\t");
+           Serial.println(steeringCommand);
+           Serial.print("Brake command:   \t\t");
+           Serial.println(brakeCommand);
+           Serial.print("Throttle command:\t\t");
+           Serial.println(throttleCommand);
+           Serial.println("");
+        }
+      }
     }
-  }
+    
 }
 
 void setThrottle() {
