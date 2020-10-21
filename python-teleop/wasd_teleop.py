@@ -12,7 +12,7 @@ import serial
 import time
 import bitstruct
 import numpy as np
-cart_port = '/dev/ttyUSB0'  #hardcoded depending on computer
+cart_port = '/dev/ttyUSB9'  #hardcoded depending on computer
 
 """ main program funcitonality """
 class teleop(object):
