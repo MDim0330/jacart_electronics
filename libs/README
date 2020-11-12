@@ -1,0 +1,5 @@
+Folder contains source for various libraries used in the Arduino Teleop board. Currently used are for DAC and PID.
+
+https://github.com/adafruit/Adafruit_MCP4725
+
+https://github.com/br3ttb/Arduino-PID-Library
