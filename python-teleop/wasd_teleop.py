@@ -8,11 +8,13 @@
 import curses
 import sys
 import math
-import serial
+import serial #this package is pySerial not serial!!!
 import time
 import bitstruct
 import numpy as np
 cart_port = '/dev/ttyUSB9'  #hardcoded depending on computer
+
+#cart_port = '/dev/cu.usbserial-144130' Mac OS value
 
 """ main program funcitonality """
 class teleop(object):
