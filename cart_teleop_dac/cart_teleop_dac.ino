@@ -1,8 +1,11 @@
 /*
    cart_teleop_new_board.ino - Contains the main arduino code for controlling our autonomous golf cart with MCP4725 DACs.
 
-      Author: Brandon Parr (modified by Dick Shimp 20201109 to include the MCP4725 DAC development boards)
+      Author: Brandon Parr
       Version: 0.5
+
+      *11/09/2020: modified by Dick Shimp to include the MCP4725 DAC development boards
+      *12/9/2020: edited by Jason Forsyth to increase code structure and readability
 */
 
 #include <Wire.h>
