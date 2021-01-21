@@ -6,6 +6,10 @@
 
       *11/09/2020: modified by Dick Shimp to include the MCP4725 DAC development boards
       *12/9/2020: edited by Jason Forsyth to increase code structure and readability
+      *1/21/2021: edited by Jason Forsyth to comment out all Serial.print() statements
+      *
+      *
+      *&&&&& NOTE: You must use the "OLD BOOTLOADER" setting when programming this device!!! Tools -> Processor -> ATMega 328P (Old Bootloader)
 */
 
 #include <Wire.h>
@@ -85,6 +89,7 @@ void setup() {
   while (!Serial) {
     delay(15);
   }
+  
   //set up DACs
   dac1.begin(0x63); //i2c address for device
   dac2.begin(0x62); //i2c address for device
@@ -100,7 +105,7 @@ void setup() {
   // set up wiper
   pinMode(wiper, INPUT);
 
-  Serial.println("STARTING");
+  //Serial.println("STARTING");
 
   //setup PID
   myPID.SetMode(AUTOMATIC);
@@ -109,12 +114,24 @@ void setup() {
 }
 
 /* Main program loop */
+
+long last_heart_beat = 0;
+unsigned int heart_beat_counter=0;
 void loop() {
   delay(1);
   readCommands();
   steer();
   setThrottle();
   setBrake();
+
+  //implement basic heart beat system
+  while(millis() - last_heart_beat>1000)
+  {
+    Serial.print("@ ");Serial.println(heart_beat_counter);
+    last_heart_beat=millis();
+    heart_beat_counter++;
+  }
+  
 }
 
 void readCommands() {
@@ -140,8 +157,8 @@ void readCommands() {
       throttleTarget = throttleCommand;
       brakeTarget = brakeCommand;
       steeringTarget = steeringCommand;
-      Serial.print("Steering Target= ");
-      Serial.println(steeringTarget);
+      //Serial.print("Steering Target= ");
+      //Serial.println(steeringTarget);
     }
   }
 }
@@ -177,17 +194,17 @@ void steer() {
     else {
       smoothedSteeringSignal = smoothedSteeringSignal * .9 + analogRead(wiper) * .1;
     }
-    Serial.print("Pot Absolute Value: ");
-    Serial.println(currentSteeringPot);
+    //Serial.print("Pot Absolute Value: ");
+    //Serial.println(currentSteeringPot);
     currentSteeringPot = mapf(smoothedSteeringSignal, LOWER_STEER_POT_BOUND, UPPER_STEER_POT_BOUND, 0.0, 100.0);
-    Serial.print("CURR POT ");
-    Serial.println(currentSteeringPot);
+    //Serial.print("CURR POT ");
+    //Serial.println(currentSteeringPot);
     myPID.Compute();
-    Serial.print("RAW COMPUTE ");
-    Serial.println(pidSignal);
+    //Serial.print("RAW COMPUTE ");
+    //Serial.println(pidSignal);
     float signal = mapf(pidSignal, LOWER_PID_BOUND, UPPER_PID_BOUND, -STEER_VOLT_MAX_OFFSET, STEER_VOLT_MAX_OFFSET);
-    Serial.print("MAPPED SIGNAL: ");
-    Serial.println(signal);
+    //Serial.print("MAPPED SIGNAL: ");
+    //Serial.println(signal);
     setSteerVoltages(signal);
   }
 }
@@ -198,10 +215,10 @@ void setSteerVoltages(float signal) {
   int finalLeft = mapf(NEUTRAL_STEER - signal, 0.0, 5.0, LOWER_STEER_BOUND, UPPER_STEER_BOUND);
   int finalRight = mapf(NEUTRAL_STEER + signal, 0.0, 5.0, LOWER_STEER_BOUND, UPPER_STEER_BOUND);
 
-  Serial.print("IF LEFT VOLT: ");
-  Serial.println(finalLeft);
-  Serial.print("IF RIGHT VOLT: ");
-  Serial.println(finalRight);
+  //Serial.print("IF LEFT VOLT: ");
+  //Serial.println(finalLeft);
+  //Serial.print("IF RIGHT VOLT: ");
+  //Serial.println(finalRight);
 
   dac1.setVoltage(finalLeft, false);
   dac2.setVoltage(finalRight, false);
