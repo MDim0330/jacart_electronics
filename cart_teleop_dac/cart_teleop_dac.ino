@@ -4,12 +4,15 @@
       Author: Brandon Parr
       Version: 0.5
 
-      *11/09/2020: modified by Dick Shimp to include the MCP4725 DAC development boards
-      *12/9/2020: edited by Jason Forsyth to increase code structure and readability
-      *1/21/2021: edited by Jason Forsyth to comment out all Serial.print() statements
-      *
-      *
-      *&&&&& NOTE: You must use the "OLD BOOTLOADER" setting when programming this device!!! Tools -> Processor -> ATMega 328P (Old Bootloader)
+       11/09/2020: modified by Dick Shimp to include the MCP4725 DAC development boards
+       12/9/2020: edited by Jason Forsyth to increase code structure and readability
+       1/21/2021: edited by Jason Forsyth to comment out all Serial.print() statements
+
+       4/29/2021: modified LOWER_BRAKE_BOUND to deal with intermittent stopping condition. Also, reduced
+       print statement verbosity to report steering, throttle, and braking targets.
+
+
+       &&&&& NOTE: You must use the Arduino Nano "OLD BOOTLOADER" setting when programming this device!!! Tools -> Processor -> ATMega 328P (Old Bootloader)
 */
 
 #include <Wire.h>
@@ -27,7 +30,7 @@ const int LOWER_THROTTLE_BOUNDS = 25;
 const int UPPER_THROTTLE_BOUND = 226;
 
 /* bounds for brake mapping */
-const int LOWER_BRAKE_BOUND = 25;
+const int LOWER_BRAKE_BOUND = 21; //adjusted to deal with intermittent braking
 const int UPPER_BRAKE_BOUND = 234;
 
 /*bounds for steering mapping */
@@ -89,7 +92,7 @@ void setup() {
   while (!Serial) {
     delay(15);
   }
-  
+
   //set up DACs
   dac1.begin(0x63); //i2c address for device
   dac2.begin(0x62); //i2c address for device
@@ -116,7 +119,7 @@ void setup() {
 /* Main program loop */
 
 long last_heart_beat = 0;
-unsigned int heart_beat_counter=0;
+unsigned int heart_beat_counter = 0;
 void loop() {
   delay(1);
   readCommands();
@@ -125,13 +128,19 @@ void loop() {
   setBrake();
 
   //implement basic heart beat system
-  while(millis() - last_heart_beat>1000)
+  while (millis() - last_heart_beat > 50)
   {
-    Serial.print("@ ");Serial.println(heart_beat_counter);
-    last_heart_beat=millis();
+    Serial.print(steeringTarget);
+    Serial.print(",");
+    Serial.print(throttleTarget);
+    Serial.print(",");
+    Serial.println(brakeTarget);
+
+
+    last_heart_beat = millis();
     heart_beat_counter++;
   }
-  
+
 }
 
 void readCommands() {
@@ -151,7 +160,7 @@ void readCommands() {
     throttleCommand = Serial.read();
     brakeCommand = Serial.read();
     steeringCommand = Serial.read();
-    
+
 
     if (throttleCommand != -1 && brakeCommand != -1 && steeringCommand != -1) {
       throttleTarget = throttleCommand;
