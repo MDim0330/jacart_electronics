@@ -128,7 +128,7 @@ void loop() {
   setBrake();
 
   //implement basic heart beat system
-  while (millis() - last_heart_beat > 50)
+  while (abs(millis() - last_heart_beat) > 50)
   {
     Serial.print(steeringTarget);
     Serial.print(",");
