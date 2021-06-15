@@ -20,8 +20,7 @@ cart_port = '/dev/ttyUSB9'  #hardcoded depending on computer
 
 #cart_port = '/dev/cu.usbserial-1463340' #Mac OS value
 
-# attempt to open each one. If the first thing received is an '@' it's the environmental
-# board. If that is what is not received, it's not the com port. If it times out, nothing is home.
+# assume the first port we find that has 'usbserial' in the name is the one from the mac
 def detect_com_port():
     ports_list = comports()
 
