@@ -12,9 +12,26 @@ import serial #this package is pySerial not serial!!!
 import time
 import bitstruct
 import numpy as np
+
+from serial.tools.list_ports import comports
+from sys import platform
+
 cart_port = '/dev/ttyUSB9'  #hardcoded depending on computer
 
-#cart_port = '/dev/cu.usbserial-144130' Mac OS value
+#cart_port = '/dev/cu.usbserial-1463340' #Mac OS value
+
+# assume the first port we find that has 'usbserial' in the name is the one from the mac
+def detect_com_port():
+    ports_list = comports()
+
+    for port_candidate in ports_list:
+        port_name = port_candidate.device
+
+        if 'usbserial' in port_name:
+            return port_name
+
+
+    return -1
 
 """ main program funcitonality """
 class teleop(object):
@@ -100,4 +117,13 @@ class teleop(object):
         stdscr.addstr(9, 0, 'Steering val: ' + str(steering) + '  ')
 
 if __name__ == "__main__":
+
+    if platform == "linux" or platform == "linux2":
+        cart_port = '/dev/ttyUSB9'
+    elif platform == "darwin":
+        cart_port=detect_com_port()
+    #elif platform == "win32":
+
+    print("Using serial port: "+str(cart_port))
+
     teleop()

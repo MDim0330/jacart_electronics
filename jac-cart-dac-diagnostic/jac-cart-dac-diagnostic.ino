@@ -7,10 +7,8 @@
        11/09/2020: modified by Dick Shimp to include the MCP4725 DAC development boards
        12/9/2020: edited by Jason Forsyth to increase code structure and readability
        1/21/2021: edited by Jason Forsyth to comment out all Serial.print() statements
-
-       4/29/2021: modified LOWER_BRAKE_BOUND to deal with intermittent stopping condition. Also, reduced
-       print statement verbosity to report steering, throttle, and braking targets.
-
+       6/2/2021: added rapid blinking for Setup() and slower blink for Loop()
+      
 
        &&&&& NOTE: You must use the Arduino Nano "OLD BOOTLOADER" setting when programming this device!!! Tools -> Processor -> ATMega 328P (Old Bootloader)
 */
@@ -114,12 +112,23 @@ void setup() {
   myPID.SetMode(AUTOMATIC);
   myPID.SetOutputLimits(LOWER_PID_BOUND, UPPER_PID_BOUND);
   myPID.SetSampleTime(20);
+
+  long timer = millis();
+
+  while(abs(millis()-timer)<5000)
+  {
+      digitalWrite(LED_BUILTIN,HIGH);
+      delay(50);
+      digitalWrite(LED_BUILTIN,LOW);
+      delay(50);
+  }
 }
 
 /* Main program loop */
 
 long last_heart_beat = 0;
 unsigned int heart_beat_counter = 0;
+boolean led_state = false;
 void loop() {
   delay(1);
   readCommands();
@@ -128,8 +137,10 @@ void loop() {
   setBrake();
 
   //implement basic heart beat system
-  while (abs(millis() - last_heart_beat) > 50)
+  while (abs(millis() - last_heart_beat) > 500)
   {
+    Serial.print(smoothedSteeringSignal);
+    Serial.print(",");
     Serial.print(steeringTarget);
     Serial.print(",");
     Serial.print(throttleTarget);
@@ -138,7 +149,10 @@ void loop() {
 
 
     last_heart_beat = millis();
-    heart_beat_counter++;
+
+    digitalWrite(LED_BUILTIN,led_state);
+
+    led_state=(led_state==true)? false:true;
   }
 
 }
@@ -154,7 +168,8 @@ void readCommands() {
 
 
   // check to see if you have gotten the magic numbers.
-  if (firstByte == MAGIC_START && secondByte == MAGIC_END) {
+  if (firstByte == MAGIC_START && secondByte == MAGIC_END) 
+  {
 
     // Read in throttle, brake, and steering data
     throttleCommand = Serial.read();
@@ -162,13 +177,22 @@ void readCommands() {
     steeringCommand = Serial.read();
 
 
-    if (throttleCommand != -1 && brakeCommand != -1 && steeringCommand != -1) {
+    if (throttleCommand != -1 && brakeCommand != -1 && steeringCommand != -1) 
+    {
       throttleTarget = throttleCommand;
       brakeTarget = brakeCommand;
       steeringTarget = steeringCommand;
       //Serial.print("Steering Target= ");
       //Serial.println(steeringTarget);
+
+      //turn ON LED when command is received from serial port
+      //digitalWrite(LED_BUILTIN, HIGH);
     }
+  }
+  else
+  {
+    //turn OFF LED when no command is received from serial port
+    //digitalWrite(LED_BUILTIN, LOW);
   }
 }
 
@@ -189,6 +213,7 @@ void setBrake() {
 
   if (brakeTarget == 255) {
     digitalWrite(brakeRelay, LOW);
+    Serial.println("Full Brake!");
   } else {
     digitalWrite(brakeRelay, HIGH);
   }
