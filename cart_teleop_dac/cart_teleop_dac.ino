@@ -74,7 +74,7 @@ double pidSignal = -1;
 
 const float KP = 30;  // proportional gain default: 10
 const float KI = 2.0; // integral gain
-const float KD = 1;   // derivative gain
+const float KD = 1.19;   // derivative gain
 PID myPID(&currentSteeringPot, &pidSignal, &steeringTarget, KP, KI, KD, DIRECT);
 
 /* magic numbers */
