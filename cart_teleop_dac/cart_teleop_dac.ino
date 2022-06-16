@@ -25,6 +25,7 @@ int brake = 6;         /* pin 5 */
 int throttleRelay = 7; /* pin 7 */
 int brakeRelay = 8;    /* pin 8 */
 int wiper = A0;        /* pin A0 */
+int speedDial = A1;    /* pin A1 */
 
 /* bounds for throttle mapping */
 const int LOWER_THROTTLE_BOUNDS = 25;
@@ -49,6 +50,7 @@ const float NEUTRAL_STEER = 2.5; // voltage to indicate "no turn" steering
 double steeringTarget = 50; // set steering wheel position to 50% which should be middle
 int brakeTarget = 0;
 int throttleTarget = 0;
+int speedDialTarget = 50;  // 50% of desired speed (will be normalized up the pipeline)
 
 const float STEER_VOLT_MAX_OFFSET = .7;
 const float STEER_VOLT_MIN_OFFSET = .3;
@@ -110,6 +112,9 @@ void setup()
   // set up wiper
   pinMode(wiper, INPUT);
 
+  // set up speed dial
+  pinMode(speedDial, INPUT);
+
   // Serial.println("STARTING");
 
   // setup PID
@@ -130,14 +135,23 @@ void loop()
   setThrottle();
   setBrake();
 
-  // implement basic heart beat system
+  // Read in value of speed potentiometer
+  // TODO: Must error check for min-max threshold and set speed to default if error (speed could hurt someone)
+  speedDialTarget = analogRead(speedDial);
+
+
+  // Send a byte array of data type string in the format:
+  // "[MagicNumber1][MagicNumber2]SteeringTarget,ThrottleTarget,BreakTarget,SpeedDialTarget\n"
   while (abs(millis() - last_heart_beat) > 50)
   {
     Serial.print(steeringTarget);
     Serial.print(",");
     Serial.print(throttleTarget);
     Serial.print(",");
-    Serial.println(brakeTarget);
+    Serial.print(brakeTarget);
+    Serial.print(",");
+    Serial.println(speedDialTarget);
+
 
     last_heart_beat = millis();
     heart_beat_counter++;
